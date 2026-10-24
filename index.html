@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daftar Hadir</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --surface: #ffffff;
+    --header: #1f5f7a;
+    --stripe: #e3f1f8;
+    --hadir: #c8f0cc;
+    --text: #1a1a1a;
+    --border: #b8d4e0;
+    --accent: #1f7a3a;
+    --setengah: #ffe9a8;
+    --bahaya: #c0392b;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161b1f;
+      --surface: #1f262c;
+      --header: #205f78;
+      --stripe: #24343d;
+      --hadir: #2a4a33;
+      --text: #e8eef2;
+      --border: #3a5360;
+      --accent: #5fd17f;
+      --setengah: #5a4a1c;
+      --bahaya: #ff7b6b;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0 8px env(safe-area-inset-bottom, 0px);
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 11px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header.atas {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    padding-top: env(safe-area-inset-top, 0px);
+    border-bottom: 1px solid var(--border);
+  }
+  .judul { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 0 4px; flex-wrap: wrap; }
+  h1 { font-size: 14px; margin: 0; }
+  h2 { font-size: 12px; margin: 0 0 6px; }
+  .navbar {
+    display: flex; gap: 4px; overflow-x: auto; white-space: nowrap;
+    padding: 4px 0 6px; -webkit-overflow-scrolling: touch;
+  }
+  .tab {
+    flex: 0 0 auto; font: inherit; font-size: 11px; padding: 5px 10px; border-radius: 16px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+  }
+  .tab.aktif { background: var(--header); color: #fff; border-color: var(--header); }
+  .tab.tambah { border-style: dashed; }
+  button.kecil {
+    font: inherit; font-size: 10px; padding: 3px 6px; border-radius: 5px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 5px; }
+  .row label { font-size: 10px; display: flex; gap: 4px; align-items: center; }
+  input[type="text"], input[type="number"], input[type="date"] {
+    font: inherit; font-size: 10px; padding: 3px 5px; border-radius: 5px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  }
+  input.nama { flex: 1 1 120px; font-weight: 600; font-size: 11px; }
+  input.tarif { width: 90px; }
+  input.jumlahIn { width: 55px; }
+  .box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px; margin: 8px 0;
+  }
+  .table-box { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  th, td { padding: 3px 4px; text-align: center; border-bottom: 1px solid var(--border); }
+  thead th { background: var(--header); color: #fff; font-weight: 600; }
+  tbody tr:nth-child(odd) td { background: var(--stripe); }
+  td.hadir-cell { background: var(--hadir) !important; }
+  td.setengah-cell { background: var(--setengah) !important; }
+  td.hadir-cell input, td.setengah-cell input { transform: scale(1.1); accent-color: var(--accent); cursor: pointer; }
+  tfoot td { font-weight: 700; background: var(--surface); border-top: 2px solid var(--header); }
+  .recap { margin-top: 6px; font-size: 11px; font-weight: 700; }
+  .recap .val { color: var(--accent); }
+  .sub { font-size: 10px; opacity: 0.7; margin: 6px 0; }
+  #peringatan { background: var(--bahaya); color: #fff; padding: 5px 8px; border-radius: 6px; margin: 4px 0; font-size: 11px; }
+  #peringatan[hidden], #toast[hidden] { display: none; }
+  #toast {
+    position: fixed; left: 8px; right: 8px; max-width: 704px; margin: 0 auto;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 20;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    background: #222; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px;
+  }
+  #toast button { font: inherit; font-weight: 700; background: none; border: 0; color: #ffd36b; cursor: pointer; padding: 4px 8px; }
+  .print-only { display: none; }
+  @media print {
+    .no-print, #toast, #peringatan { display: none !important; }
+    .print-only { display: inline !important; }
+    .print-only.block { display: block !important; margin-bottom: 8px; }
+    header.atas { position: static; border: none; }
+    * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
+    th { background: #ddd !important; }
+    .hadir-cell { background: #cfe9d2 !important; }
+    .setengah-cell { background: #fff2c2 !important; }
+    .box { break-inside: avoid; border: 1px solid #999; }
+    .table-box { overflow: visible; border: 1px solid #999; }
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="atas">
+    <div class="judul no-print">
+      <h1>Daftar Hadir</h1>
+      <div class="row" style="margin:0">
+        <button type="button" class="kecil" id="simpanFileBtn">Simpan File</button>
+        <button type="button" class="kecil" id="muatFileBtn">Muat File</button>
+        <button type="button" class="kecil" id="muatUrlBtn">Muat URL</button>
+        <button type="button" class="kecil" id="salinLinkBtn">Salin Link</button>
+        <button type="button" class="kecil" id="waBtn">WhatsApp</button>
+        <button type="button" class="kecil" id="cetakBtn">Cetak / PDF</button>
+        <input type="file" id="muatFileInput" accept=".json,application/json" hidden>
+      </div>
+    </div>
+    <div id="peringatan" class="no-print" role="alert" hidden>Data gagal tersimpan di browser ini. Ketuk "Simpan File" sekarang agar data tidak hilang.</div>
+    <div class="print-only block">
+      <h1>Rekap Daftar Hadir</h1>
+      <div id="tglCetak"></div>
+    </div>
+    <nav class="navbar no-print" id="navbar" aria-label="Pekerja"></nav>
+  </header>
+  <div id="app"></div>
+</div>
+<div id="toast" role="status" hidden><span id="toastTeks"></span><button type="button" id="toastBtn">Urungkan</button></div>
+
+<script>
+  const HARI = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const KUNCI = 'daftarHadir_v9';
+  const KUNCI_LAMA = ['daftarHadir_v8', 'daftarHadir_v6'];
+  const KUNCI_EKSPOR = 'daftarHadir_ekspor';
+  const REKAP = '__rekap__';
+  let state = { workers: [] };
+  let aktif = REKAP;
+  let modeCetak = false;
+  let toastTimer = null;
+  let toastUndo = null;
+  const cardRefs = new Map();
+  const tabRefs = new Map();
+
+  // ---------- tanggal & angka ----------
+  function iso(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function parseIso(s) { const p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+  function addDays(s, n) { const d = parseIso(s); d.setDate(d.getDate() + n); return iso(d); }
+  function hariIni() { return iso(new Date()); }
+  function tgl(s) {
+    const d = parseIso(s);
+    return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getFullYear()).slice(-2);
+  }
+  function tglValid(s) { return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && iso(parseIso(s)) === s; }
+  function rupiah(n) { return 'Rp ' + Math.round(Number(n) || 0).toLocaleString('id-ID'); }
+  function fmt(n) { return n.toLocaleString('id-ID', { maximumFractionDigits: 1 }); }
+  function idBaru() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function daftarHari(w) {
+    const list = [];
+    for (let i = 0; i < w.jumlahHari; i++) list.push(addDays(w.mulai, i));
+    return list;
+  }
+  /** Hapus entri hadir yang di luar rentang tanggal pekerja */
+  function bersihkanHadir(w) {
+    const valid = new Set(daftarHari(w));
+    Object.keys(w.hadir).forEach(function (d) {
+      if (!valid.has(d)) delete w.hadir[d];
+    });
+  }
+  // nilai per hari: 1 = penuh, 0.5 = setengah hari
+  function hitung(w) {
+    let total = 0, penuh = 0, setengah = 0;
+    daftarHari(w).forEach(function (d) {
+      const v = w.hadir[d] || 0;
+      total += v;
+      if (v === 1) penuh++; else if (v === 0.5) setengah++;
+    });
+    return { total: total, penuh: penuh, setengah: setengah };
+  }
+
+  // ---------- penyimpanan ----------
+  function peringatan(tampil) { document.getElementById('peringatan').hidden = !tampil; }
+  function simpan() {
+    try { localStorage.setItem(KUNCI, JSON.stringify(state)); peringatan(false); }
+    catch (e) { peringatan(true); }
+  }
+  function muat() {
+    try {
+      let raw = localStorage.getItem(KUNCI);
+      if (!raw) {
+        for (let i = 0; i < KUNCI_LAMA.length; i++) {
+          raw = localStorage.getItem(KUNCI_LAMA[i]);
+          if (raw) break;
+        }
+      }
+      return raw ? normalisasi(JSON.parse(raw)) : null;
+    } catch (e) { return null; }
+  }
+  function normalisasi(d) {
+    if (!d || !Array.isArray(d.workers)) return null;
+    const ids = new Set();
+    return {
+      workers: d.workers.map(function (w) {
+        w = w || {};
+        let id = String(w.id || '');
+        if (!id || ids.has(id)) id = idBaru();
+        ids.add(id);
+        const hadir = {};
+        if (Array.isArray(w.hadir)) {            // format lama: daftar tanggal = hari penuh
+          w.hadir.forEach(function (s) { if (tglValid(s)) hadir[s] = 1; });
+        } else if (w.hadir && typeof w.hadir === 'object') {
+          Object.keys(w.hadir).forEach(function (s) {
+            const v = Number(w.hadir[s]);
+            if (tglValid(s) && (v === 1 || v === 0.5)) hadir[s] = v;
+          });
+        }
+        const pekerja = {
+          id: id,
+          nama: String(w.nama || 'Pekerja').trim() || 'Pekerja',
+          tarif: Math.max(0, Number(w.tarif) || 0),
+          mulai: tglValid(w.mulai) ? w.mulai : hariIni(),
+          jumlahHari: Math.min(366, Math.max(1, Math.floor(Number(w.jumlahHari)) || 31)),
+          hadir: hadir
+        };
+        bersihkanHadir(pekerja); // buang tanggal di luar rentang
+        return pekerja;
+      })
+    };
+  }
+
+  // ---------- urungkan ----------
+  function tampilToast(pesan, undo) {
+    clearTimeout(toastTimer);
+    toastUndo = undo;
+    document.getElementById('toastTeks').textContent = pesan;
+    document.getElementById('toast').hidden = false;
+    toastTimer = setTimeout(function () { document.getElementById('toast').hidden = true; toastUndo = null; }, 8000);
+  }
+  function denganUndo(pesan, aksi) {
+    const snap = JSON.stringify(state);
+    const snapAktif = aktif;
+    aksi();
+    tampilToast(pesan, function () {
+      state = JSON.parse(snap);
+      aktif = snapAktif;
+      simpan();
+      renderSemua();
+    });
+  }
+  document.getElementById('toastBtn').addEventListener('click', function () {
+    const fn = toastUndo;
+    document.getElementById('toast').hidden = true;
+    toastUndo = null;
+    clearTimeout(toastTimer);
+    if (fn) fn();
+  });
+
+  // ---------- pembuat elemen ----------
+  function h(tag, props, kids) {
+    props = props || {};
+    const el = document.createElement(tag);
+    Object.keys(props).forEach(function (k) {
+      const v = props[k];
+      if (k.indexOf('on') === 0) el.addEventListener(k.slice(2), v);
+      else if (k === 'class') el.className = v;
+      else if (k === 'value' || k === 'checked') el[k] = v;
+      else el.setAttribute(k, v);
+    });
+    (Array.isArray(kids) ? kids : [kids]).forEach(function (c) {
+      if (c === null || c === undefined || c === false) return;
+      el.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(String(c)) : c);
+    });
+    return el;
+  }
+
+  // ---------- aksi data ----------
+  function cariPekerja(id) { return state.workers.find(function (w) { return w.id === id; }); }
+  function ubah(id, patch, pesanUndo) {
+    // ubah yang memengaruhi tabel; jika pesanUndo ada, aksi bisa diurungkan
+    const w = cariPekerja(id);
+    if (!w) return;
+    const jalankan = function () {
+      Object.assign(w, patch);
+      if (patch.mulai !== undefined || patch.jumlahHari !== undefined) bersihkanHadir(w);
+      simpan();
+      renderKonten();
+    };
+    if (pesanUndo) denganUndo(pesanUndo, jalankan);
+    else jalankan();
+  }
+  function tambahPekerja() {
+    const last = state.workers[state.workers.length - 1];
+    const id = idBaru();
+    state.workers.push({
+      id: id,
+      nama: 'Pekerja ' + (state.workers.length + 1),
+      tarif: last ? last.tarif : 0,
+      mulai: last ? last.mulai : hariIni(),
+      jumlahHari: last ? last.jumlahHari : 31,
+      hadir: {}
+    });
+    aktif = id;
+    simpan();
+    renderNav();
+    renderKonten();
+  }
+  function hapusPekerja(id) {
+    const w = cariPekerja(id);
+    if (!w) return;
+    denganUndo('"' + w.nama + '" dihapus.', function () {
+      state.workers = state.workers.filter(function (x) { return x.id !== id; });
+      aktif = REKAP;
+      simpan();
+      renderNav();
+      renderKonten();
+    });
+  }
+  function setHadir(w, d, v) {
+    if (v === 0) delete w.hadir[d]; else w.hadir[d] = v;
+    simpan();
+    refreshRekap();
+  }
+  function tombolHapus(id) {
+    const b = h('button', { type: 'button', class: 'kecil no-print' }, 'Hapus');
+    let siap = false, timer = null;
+    b.addEventListener('click', function () {
+      if (!siap) {
+        siap = true;
+        b.textContent = 'Ketuk lagi';
+        b.style.color = 'var(--bahaya)';
+        b.style.borderColor = 'var(--bahaya)';
+        timer = setTimeout(function () {
+          siap = false; b.textContent = 'Hapus'; b.style.color = ''; b.style.borderColor = '';
+        }, 3000);
+        return;
+      }
+      clearTimeout(timer);
+      hapusPekerja(id);
+    });
+    return b;
+  }
+
+  // ---------- rekap ----------
+  function refreshRekap() {
+    state.workers.forEach(function (w) {
+      const ref = cardRefs.get(w.id);
+      if (!ref) return;
+      const r = hitung(w);
+      ref.hari.textContent = fmt(r.total);
+      ref.detail.textContent = r.setengah ? ' (' + r.penuh + ' penuh, ' + r.setengah + ' setengah)' : '';
+      ref.gaji.textContent = rupiah(r.total * w.tarif);
+    });
+    renderGlobal();
+  }
+  function rekapBox() {
+    return h('section', { class: 'box' }, [h('h2', {}, 'Rekap Global'), h('div', { id: 'global' })]);
+  }
+  function renderGlobal() {
+    const global = document.getElementById('global');
+    if (!global) return;
+    let totHari = 0, totGaji = 0;
+    const rows = state.workers.map(function (w, i) {
+      const r = hitung(w);
+      const gaji = r.total * w.tarif;
+      totHari += r.total;
+      totGaji += gaji;
+      return h('tr', {}, [
+        h('td', {}, String(i + 1)),
+        h('td', { style: 'text-align:left' }, w.nama),
+        h('td', {}, fmt(r.total)),
+        h('td', {}, rupiah(gaji)),
+        h('td', { class: 'no-print' }, tombolHapus(w.id))
+      ]);
+    });
+    global.replaceChildren(h('div', { class: 'table-box' }, [
+      h('table', {}, [
+        h('thead', {}, [h('tr', {}, [h('th', {}, 'NO'), h('th', {}, 'NAMA'), h('th', {}, 'HARI HADIR'), h('th', {}, 'TOTAL GAJI'), h('th', { class: 'no-print' }, '')])]),
+        h('tbody', {}, rows.length ? rows : [h('tr', {}, [h('td', { colspan: '5' }, 'Belum ada pekerja')])]),
+        h('tfoot', {}, [h('tr', {}, [
+          h('td', { colspan: '2' }, 'TOTAL'),
+          h('td', {}, fmt(totHari)),
+          h('td', {}, rupiah(totGaji)),
+          h('td', { class: 'no-print' }, '')
+        ])])
+      ])
+    ]));
+  }
+
+  // ---------- kartu per pekerja ----------
+  const SIKLUS = { 0: 1, 1: 0.5, 0.5: 0 };   // kosong -> penuh -> setengah -> kosong
+  function tampilSel(td, cb, d, v) {
+    td.className = v === 1 ? 'hadir-cell' : v === 0.5 ? 'setengah-cell' : '';
+    cb.checked = v === 1;
+    cb.indeterminate = v === 0.5;
+    cb.setAttribute('aria-label', 'Hadir ' + tgl(d) + (v === 0.5 ? ' (setengah hari)' : ''));
+  }
+  function kartu(w) {
+    const hariList = daftarHari(w);
+
+    const tbody = h('tbody', {});
+    hariList.forEach(function (d) {
+      const cb = h('input', { type: 'checkbox' });
+      const td = h('td', {}, [cb]);
+      tampilSel(td, cb, d, w.hadir[d] || 0);
+      cb.addEventListener('click', function () {
+        const v = SIKLUS[w.hadir[d] || 0];
+        // setiap perubahan kotak bisa diurungkan lewat tombol Urungkan
+        denganUndo('Tanggal ' + tgl(d) + ' (' + w.nama + ') diubah.', function () {
+          setHadir(w, d, v);
+        });
+        tampilSel(td, cb, d, v);
+      });
+      tbody.appendChild(h('tr', {}, [
+        h('td', {}, tgl(d)),
+        h('td', {}, HARI[parseIso(d).getDay()]),
+        td
+      ]));
+    });
+
+    const hariEl = h('span', { class: 'val' }, '0');
+    const detailEl = h('span', { style: 'font-weight:400;opacity:.8' }, '');
+    const gajiEl = h('span', { class: 'val' }, rupiah(0));
+    cardRefs.set(w.id, { hari: hariEl, detail: detailEl, gaji: gajiEl });
+
+    return h('section', { class: 'box' }, [
+      h('div', { class: 'row' }, [
+        h('input', {
+          type: 'text', class: 'nama no-print', value: w.nama, 'aria-label': 'Nama pekerja',
+          oninput: function (e) {
+            const t = tabRefs.get(w.id);
+            if (t) t.textContent = e.target.value.trim() || w.nama;
+          },
+          onchange: function (e) {
+            w.nama = e.target.value.trim() || w.nama;
+            e.target.value = w.nama;
+            simpan();
+            const t = tabRefs.get(w.id);
+            if (t) t.textContent = w.nama;
+          }
+        }),
+        tombolHapus(w.id)
+      ]),
+      h('span', { class: 'print-only' }, w.nama + ' · Gaji/hari ' + rupiah(w.tarif) + ' · Mulai ' + tgl(w.mulai)),
+      h('div', { class: 'row no-print' }, [
+        h('label', {}, [
+          'Gaji/hari',
+          h('input', {
+            type: 'number', min: '0', inputmode: 'numeric', class: 'tarif', value: w.tarif, 'aria-label': 'Gaji per hari',
+            onchange: function (e) {
+              const baru = Math.max(0, Number(e.target.value) || 0);
+              e.target.value = baru;
+              if (baru === w.tarif) return;
+              denganUndo('Gaji/hari ' + w.nama + ' diubah.', function () {
+                w.tarif = baru;
+                simpan();
+                refreshRekap();
+              });
+            }
+          })
+        ]),
+        h('label', {}, [
+          'Tanggal mulai',
+          h('input', {
+            type: 'date', value: w.mulai, 'aria-label': 'Tanggal mulai',
+            onchange: function (e) {
+              if (e.target.value && e.target.value !== w.mulai) {
+                ubah(w.id, { mulai: e.target.value }, 'Tanggal mulai ' + w.nama + ' diubah.');
+              }
+            }
+          })
+        ]),
+        h('label', {}, [
+          'Jumlah hari',
+          h('input', {
+            type: 'number', min: '1', max: '366', inputmode: 'numeric', class: 'jumlahIn', value: w.jumlahHari, 'aria-label': 'Jumlah hari',
+            onchange: function (e) {
+              let n = parseInt(e.target.value, 10);
+              if (isNaN(n) || n < 1) n = 1;
+              if (n > 366) n = 366;
+              e.target.value = n;
+              if (n === w.jumlahHari) return;
+              ubah(w.id, { jumlahHari: n }, 'Jumlah hari ' + w.nama + ' diubah.');
+            }
+          })
+        ]),
+        h('button', {
+          type: 'button', class: 'kecil',
+          onclick: function () {
+            denganUndo('Centang ' + w.nama + ' dikosongkan.', function () { w.hadir = {}; simpan(); renderKonten(); });
+          }
+        }, 'Kosongkan Centang'),
+        h('button', {
+          type: 'button', class: 'kecil',
+          onclick: function () {
+            denganUndo('Hari kerja Sen–Sab diisi penuh.', function () {
+              daftarHari(w).forEach(function (d) { if (parseIso(d).getDay() !== 0) w.hadir[d] = 1; });
+              simpan();
+              renderKonten();
+            });
+          }
+        }, 'Isi Sen–Sab')
+      ]),
+      h('div', { class: 'table-box' }, [
+        h('table', {}, [
+          h('thead', {}, [h('tr', {}, [h('th', {}, 'TANGGAL'), h('th', {}, 'HARI'), h('th', { title: 'Ketuk: centang = penuh, strip = setengah hari, kosong = tidak hadir' }, 'HADIR')])]),
+          tbody
+        ])
+      ]),
+      h('div', { class: 'recap' }, ['Hadir: ', hariEl, ' hari', detailEl, '  ·  Gaji: ', gajiEl])
+    ]);
+  }
+
+  // ---------- navbar & render ----------
+  function renderNav() {
+    tabRefs.clear();
+    const items = state.workers.map(function (w) {
+      const b = h('button', {
+        type: 'button', class: 'tab' + (aktif === w.id ? ' aktif' : ''),
+        onclick: function () { aktif = w.id; renderNav(); renderKonten(); }
+      }, w.nama);
+      tabRefs.set(w.id, b);
+      return b;
+    });
+    items.push(h('button', {
+      type: 'button', class: 'tab' + (aktif === REKAP ? ' aktif' : ''),
+      onclick: function () { aktif = REKAP; renderNav(); renderKonten(); }
+    }, 'Rekap'));
+    items.push(h('button', { type: 'button', class: 'tab tambah', onclick: tambahPekerja }, '+ Pekerja'));
+    document.getElementById('navbar').replaceChildren.apply(document.getElementById('navbar'), items);
+  }
+  function renderKonten() {
+    const app = document.getElementById('app');
+    const children = [];
+    cardRefs.clear();
+    if (modeCetak) {
+      children.push(rekapBox());
+      state.workers.forEach(function (w) { children.push(kartu(w)); });
+    } else if (aktif === REKAP || !cariPekerja(aktif)) {
+      if (aktif !== REKAP) { aktif = REKAP; renderNav(); }
+      if (!state.workers.length) children.push(h('div', { class: 'sub' }, 'Belum ada pekerja. Ketuk "+ Pekerja" di atas untuk memulai.'));
+      children.push(rekapBox());
+      children.push(h('div', { class: 'sub no-print' }, 'Ketuk nama pekerja di atas untuk mengisi kehadiran. Kotak hadir: centang = penuh, strip kuning = setengah hari.'));
+    } else {
+      children.push(kartu(cariPekerja(aktif)));
+    }
+    app.replaceChildren.apply(app, children);
+    refreshRekap();
+  }
+  function renderInfo() {
+    let t = 0;
+    try { t = Number(localStorage.getItem(KUNCI_EKSPOR)) || 0; } catch (e) {}
+    const btn = document.getElementById('simpanFileBtn');
+    let lama, teks;
+    if (!t) { teks = 'Belum pernah menyimpan file cadangan'; lama = true; }
+    else {
+      const n = Math.floor((Date.now() - t) / 864e5);
+      teks = 'File cadangan terakhir: ' + (n < 1 ? 'hari ini' : n + ' hari lalu');
+      lama = n >= 7;
+    }
+    btn.title = teks;
+    btn.style.color = lama ? 'var(--bahaya)' : '';
+    btn.style.borderColor = lama ? 'var(--bahaya)' : '';
+  }
+  function renderSemua() {
+    if (aktif !== REKAP && !cariPekerja(aktif)) aktif = REKAP;
+    renderNav();
+    renderKonten();
+    renderInfo();
+  }
+
+  // ---------- file & cetak ----------
+  function simpanKeFile() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: 'daftar_hadir_' + hariIni() + '.json' });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    try { localStorage.setItem(KUNCI_EKSPOR, String(Date.now())); } catch (e) {}
+    renderInfo();
+  }
+  function mulaiCetak() {
+    if (modeCetak) return;
+    modeCetak = true;
+    renderKonten();
+  }
+  function selesaiCetak() {
+    if (!modeCetak) return;
+    modeCetak = false;
+    renderKonten();
+  }
+  window.addEventListener('beforeprint', function () {
+    mulaiCetak();
+    document.getElementById('tglCetak').textContent = 'Dicetak: ' + tgl(hariIni()) + ' (' + new Date().toLocaleTimeString('id-ID') + ')';
+  });
+  window.addEventListener('afterprint', selesaiCetak);
+  if (window.matchMedia) {
+    window.matchMedia('print').addEventListener('change', function (e) { if (!e.matches) selesaiCetak(); });
+  }
+  document.getElementById('cetakBtn').addEventListener('click', function () {
+    mulaiCetak();
+    setTimeout(function () { window.print(); }, 100);
+  });
+  document.getElementById('simpanFileBtn').addEventListener('click', simpanKeFile);
+  document.getElementById('muatFileBtn').addEventListener('click', function () {
+    document.getElementById('muatFileInput').click();
+  });
+  document.getElementById('muatFileInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function () {
+      let data = null;
+      try { data = normalisasi(JSON.parse(reader.result)); } catch (err) {}
+      if (!data) { alert('File tidak valid. Pilih file .json hasil "Simpan File".'); return; }
+      denganUndo('Data diganti dengan isi file.', function () {
+        state = data;
+        aktif = REKAP;
+        simpan();
+        renderSemua();
+      });
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // ---------- muat dari URL ----------
+  function muatDariUrl() {
+    const url = window.prompt(
+      'Tempel URL file JSON (hasil "Simpan File").\n\nContoh:\nhttps://example.com/daftar_hadir.json',
+      ''
+    );
+    if (url === null) return; // batal
+    const alamat = String(url).trim();
+    if (!alamat) {
+      alert('URL kosong. Masukkan alamat file JSON.');
+      return;
+    }
+    // Validasi kasar skema
+    if (!/^https?:\/\//i.test(alamat)) {
+      alert('URL harus diawali http:// atau https://');
+      return;
+    }
+    const btn = document.getElementById('muatUrlBtn');
+    const teksLama = btn.textContent;
+    btn.textContent = 'Memuat…';
+    btn.disabled = true;
+
+    fetch(alamat, { method: 'GET', cache: 'no-store' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function (teks) {
+        let data = null;
+        try { data = normalisasi(JSON.parse(teks)); } catch (err) {}
+        if (!data) {
+          alert('Isi URL bukan JSON daftar hadir yang valid.\nPastikan file hasil "Simpan File".');
+          return;
+        }
+        denganUndo('Data diganti dari URL.', function () {
+          state = data;
+          aktif = REKAP;
+          simpan();
+          renderSemua();
+        });
+      })
+      .catch(function (err) {
+        var pesan = 'Gagal memuat dari URL.';
+        if (err && /Failed to fetch|NetworkError|CORS/i.test(String(err.message || err))) {
+          pesan += '\n\nKemungkinan penyebab:\n• Tidak ada internet\n• Server memblokir akses (CORS)\n• URL salah atau file tidak publik';
+        } else if (err && err.message) {
+          pesan += '\n\n' + err.message;
+        }
+        alert(pesan);
+      })
+      .finally(function () {
+        btn.textContent = teksLama;
+        btn.disabled = false;
+      });
+  }
+  document.getElementById('muatUrlBtn').addEventListener('click', muatDariUrl);
+
+  // ---------- bagikan ke WhatsApp ----------
+  function teksRekapWa() {
+    const baris = [];
+    baris.push('*Rekap Daftar Hadir*');
+    baris.push('Tanggal: ' + tgl(hariIni()));
+    baris.push('');
+    let totHari = 0, totGaji = 0;
+    if (!state.workers.length) {
+      baris.push('(Belum ada pekerja)');
+    } else {
+      state.workers.forEach(function (w, i) {
+        const r = hitung(w);
+        const gaji = r.total * w.tarif;
+        totHari += r.total;
+        totGaji += gaji;
+        let detail = fmt(r.total) + ' hari';
+        if (r.setengah) detail += ' (' + r.penuh + ' penuh, ' + r.setengah + ' setengah)';
+        baris.push((i + 1) + '. *' + w.nama + '*');
+        baris.push('   Hadir: ' + detail);
+        baris.push('   Gaji: ' + rupiah(gaji) + ' (tarif ' + rupiah(w.tarif) + '/hari)');
+        baris.push('');
+      });
+      baris.push('——————');
+      baris.push('*TOTAL: ' + fmt(totHari) + ' hari · ' + rupiah(totGaji) + '*');
+    }
+    return baris.join('\n');
+  }
+  function bagikanWhatsApp() {
+    const teks = teksRekapWa();
+    const url = 'https://wa.me/?text=' + encodeURIComponent(teks);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+  document.getElementById('waBtn').addEventListener('click', bagikanWhatsApp);
+
+  // ---------- link share (data di hash URL) ----------
+  function keBase64(str) {
+    // dukung karakter non-ASCII (nama pekerja, dll.)
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function dariBase64(b64) {
+    return decodeURIComponent(escape(atob(b64)));
+  }
+  function buatLinkShare() {
+    const json = JSON.stringify(state);
+    const b64 = keBase64(json);
+    // buang hash lama, pasang data baru
+    const dasar = location.href.split('#')[0];
+    return dasar + '#d=' + b64;
+  }
+  function salinLinkShare() {
+    const link = buatLinkShare();
+    const panjang = link.length;
+    // URL sangat panjang bisa gagal di beberapa aplikasi chat
+    if (panjang > 30000) {
+      alert('Data terlalu besar untuk link.\nGunakan "Simpan File" lalu bagikan file JSON, atau unggah JSON dan pakai "Muat URL".');
+      return;
+    }
+    function selesai(ok) {
+      if (ok) {
+        tampilToast('Link disalin. Tempel di chat/browser untuk membuka data ini.', null);
+        if (location.protocol === 'file:') {
+          setTimeout(function () {
+            alert(
+              'Catatan: file dibuka dari komputer (bukan website).\n\n' +
+              'Agar link bisa dibuka di HP/browser lain:\n' +
+              '1. Unggah file HTML ini ke internet (GitHub Pages, Netlify, dll.), atau\n' +
+              '2. Pakai "Simpan File" + "Muat URL" dengan file JSON.'
+            );
+          }, 100);
+        }
+      } else {
+        // fallback: tampilkan link agar user bisa salin manual
+        window.prompt('Salin link ini (Ctrl+C):', link);
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(function () { selesai(true); }).catch(function () { selesai(false); });
+    } else {
+      selesai(false);
+    }
+  }
+  function muatDariHash() {
+    const hash = location.hash || '';
+    const m = hash.match(/^#d=([\s\S]+)/);
+    if (!m) return false;
+    try {
+      const json = dariBase64(m[1]);
+      const data = normalisasi(JSON.parse(json));
+      if (!data) return false;
+      state = data;
+      aktif = REKAP;
+      simpan();
+      // bersihkan hash agar refresh tidak memuat ulang paksa
+      try { history.replaceState(null, '', location.href.split('#')[0]); } catch (e) {}
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  document.getElementById('salinLinkBtn').addEventListener('click', salinLinkShare);
+
+  // ---------- sinkron antar tab browser ----------
+  window.addEventListener('storage', function (e) {
+    if (e.key !== KUNCI || !e.newValue) return;
+    try {
+      const d = normalisasi(JSON.parse(e.newValue));
+      if (d) { state = d; renderSemua(); }
+    } catch (err) {}
+  });
+
+  // ---------- mulai ----------
+  const dariLink = muatDariHash();
+  if (!dariLink) {
+    state = muat() || { workers: [] };
+    if (!state.workers.length) {
+      state.workers.push({ id: 'p1', nama: 'Pekerja 1', tarif: 0, mulai: hariIni(), jumlahHari: 31, hadir: {} });
+    }
+  }
+  simpan();
+  if (dariLink) {
+    aktif = REKAP;
+  } else {
+    aktif = state.workers[0] ? state.workers[0].id : REKAP;
+  }
+  renderSemua();
+  if (dariLink) {
+    tampilToast('Data dimuat dari link share.', null);
+  }
+</script>
+</body>
+</html>
