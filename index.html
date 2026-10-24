@@ -40,7 +40,7 @@
     background: var(--bg);
     color: var(--text);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    font-size: 11px;
+    font-size: 9px;
   }
   .wrap { max-width: 720px; margin: 0 auto; }
   header.atas {
@@ -50,40 +50,40 @@
     border-bottom: 1px solid var(--border);
   }
   .judul { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 0 4px; flex-wrap: wrap; }
-  h1 { font-size: 14px; margin: 0; }
-  h2 { font-size: 12px; margin: 0 0 6px; }
+  h1 { font-size: 12px; margin: 0; }
+  h2 { font-size: 10px; margin: 0 0 6px; }
   .navbar {
     display: flex; gap: 4px; overflow-x: auto; white-space: nowrap;
     padding: 4px 0 6px; -webkit-overflow-scrolling: touch;
   }
   .tab {
-    flex: 0 0 auto; font: inherit; font-size: 11px; padding: 5px 10px; border-radius: 16px;
+    flex: 0 0 auto; font: inherit; font-size: 9px; padding: 5px 10px; border-radius: 16px;
     border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
   }
   .tab.aktif { background: var(--header); color: #fff; border-color: var(--header); }
   .tab.tambah { border-style: dashed; }
   button.kecil {
-    font: inherit; font-size: 10px; padding: 3px 6px; border-radius: 5px;
+    font: inherit; font-size: 8px; padding: 3px 6px; border-radius: 5px;
     border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
   }
   .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 5px; }
-  .row label { font-size: 10px; display: flex; gap: 4px; align-items: center; }
+  .row label { font-size: 8px; display: flex; gap: 4px; align-items: center; }
   input[type="text"], input[type="number"], input[type="date"] {
-    font: inherit; font-size: 10px; padding: 3px 5px; border-radius: 5px;
+    font: inherit; font-size: 8px; padding: 3px 5px; border-radius: 5px;
     border: 1px solid var(--border); background: var(--surface); color: var(--text);
   }
-  input.nama { flex: 1 1 120px; font-weight: 600; font-size: 11px; }
+  input.nama { flex: 1 1 120px; font-weight: 600; font-size: 9px; }
   input.tarif { width: 90px; }
   input.jumlahIn { width: 55px; }
   .form-tambah label { flex-direction: column; align-items: flex-start; gap: 2px; }
-  .form-tambah input.nama { width: 100%; flex: none; font-size: 13px; padding: 6px 8px; }
+  .form-tambah input.nama { width: 100%; flex: none; font-size: 11px; padding: 6px 8px; }
   .form-tambah .row { margin-bottom: 8px; }
   .box {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; padding: 8px; margin: 8px 0;
   }
   .table-box { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; }
-  table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 8px; }
   th, td { padding: 3px 4px; text-align: center; border-bottom: 1px solid var(--border); }
   thead th { background: var(--header); color: #fff; font-weight: 600; }
   tbody tr:nth-child(odd) td { background: var(--stripe); }
@@ -91,18 +91,43 @@
   td.setengah-cell { background: var(--setengah) !important; }
   td.hadir-cell input, td.setengah-cell input { transform: scale(1.1); accent-color: var(--accent); cursor: pointer; }
   tfoot td { font-weight: 700; background: var(--surface); border-top: 2px solid var(--header); }
-  .recap { margin-top: 6px; font-size: 11px; font-weight: 700; }
+  .recap { margin-top: 6px; font-size: 9px; font-weight: 700; }
   .recap .val { color: var(--accent); }
-  .sub { font-size: 10px; opacity: 0.7; margin: 6px 0; }
-  #peringatan { background: var(--bahaya); color: #fff; padding: 5px 8px; border-radius: 6px; margin: 4px 0; font-size: 11px; }
+  .sub { font-size: 8px; opacity: 0.7; margin: 6px 0; }
+  #peringatan { background: var(--bahaya); color: #fff; padding: 5px 8px; border-radius: 6px; margin: 4px 0; font-size: 9px; }
   #peringatan[hidden], #toast[hidden] { display: none; }
   #toast {
     position: fixed; left: 8px; right: 8px; max-width: 704px; margin: 0 auto;
     bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 20;
     display: flex; justify-content: space-between; align-items: center; gap: 8px;
-    background: #222; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px;
+    background: #222; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 10px;
   }
   #toast button { font: inherit; font-weight: 700; background: none; border: 0; color: #ffd36b; cursor: pointer; padding: 4px 8px; }
+  select {
+    font: inherit; font-size: 8px; padding: 3px 5px; border-radius: 5px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  }
+  .ceklis th.hr { font-size: 8px; line-height: 1.3; min-width: 44px; }
+  .ceklis th.hr small { display: block; font-size: 7px; font-weight: 400; opacity: .9; }
+  .ceklis th.today { box-shadow: inset 0 -3px 0 #ffd36b; }
+  .menu-wrap { position: relative; }
+  .menu-panel {
+    position: absolute; right: 0; top: calc(100% + 4px); min-width: 170px; z-index: 30;
+    display: flex; flex-direction: column; padding: 4px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  }
+  .menu-panel[hidden] { display: none; }
+  .menu-panel button {
+    font: inherit; font-size: 10px; text-align: left; padding: 9px 10px;
+    border: 0; border-radius: 6px; background: none; color: var(--text); cursor: pointer;
+  }
+  .menu-panel button:hover { background: var(--stripe); }
+  .ceklis td.nm { text-align: left; font-weight: 600; font-size: 9px; padding: 4px 6px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ceklis td.cel { cursor: pointer; height: 42px; padding: 0; }
+  .ceklis td.cel input { width: 20px; height: 20px; transform: none; pointer-events: none; }
+  .ceklis td.off { opacity: .3; cursor: default; }
+  .ceklis td.today-c { border-left: 2px solid var(--accent); border-right: 2px solid var(--accent); }
   .print-only { display: none; }
   @media print {
     .no-print, #toast, #peringatan { display: none !important; }
@@ -124,13 +149,16 @@
   <header class="atas">
     <div class="judul no-print">
       <h1>Daftar Hadir</h1>
-      <div class="row" style="margin:0">
-        <button type="button" class="kecil" id="simpanFileBtn">Simpan File</button>
-        <button type="button" class="kecil" id="muatFileBtn">Muat File</button>
-        <button type="button" class="kecil" id="muatUrlBtn">Muat URL</button>
-        <button type="button" class="kecil" id="salinLinkBtn">Salin Link</button>
-        <button type="button" class="kecil" id="waBtn">WhatsApp</button>
-        <button type="button" class="kecil" id="cetakBtn">Cetak / PDF</button>
+      <div class="menu-wrap">
+        <button type="button" class="kecil" id="menuBtn" aria-haspopup="true" aria-expanded="false">☰ Menu</button>
+        <div class="menu-panel" id="menuPanel" role="menu" hidden>
+          <button type="button" role="menuitem" id="simpanFileBtn">Simpan File</button>
+          <button type="button" role="menuitem" id="muatFileBtn">Muat File</button>
+          <button type="button" role="menuitem" id="muatUrlBtn">Muat URL</button>
+          <button type="button" role="menuitem" id="salinLinkBtn">Salin Link</button>
+          <button type="button" role="menuitem" id="waBtn">WhatsApp</button>
+          <button type="button" role="menuitem" id="cetakBtn">Cetak / PDF</button>
+        </div>
         <input type="file" id="muatFileInput" accept=".json,application/json" hidden>
       </div>
     </div>
@@ -152,6 +180,11 @@
   const KUNCI_EKSPOR = 'daftarHadir_ekspor';
   const REKAP = '__rekap__';
   const TAMBAH = '__tambah__';
+  const CEKLIS = '__ceklis__';
+  const KUNCI_CEKLIS = 'daftarHadir_ceklisHari';
+  let jumlahKolom = 5;
+  try { const j = parseInt(localStorage.getItem(KUNCI_CEKLIS), 10); if (j >= 2 && j <= 5) jumlahKolom = j; } catch (e) {}
+  let tanggalRender = '';
   let state = { workers: [] };
   let aktif = REKAP;
   let modeCetak = false;
@@ -457,17 +490,19 @@
         h('td', {}, String(i + 1)),
         h('td', { style: 'text-align:left' }, w.nama),
         h('td', {}, fmt(r.total)),
-        h('td', {}, rupiah(gaji)),
+        h('td', {}, rupiah(w.tarif)),
+        h('td', { style: 'font-weight:700' }, rupiah(gaji)),
         h('td', { class: 'no-print' }, tombolHapus(w.id))
       ]);
     });
     global.replaceChildren(h('div', { class: 'table-box' }, [
       h('table', {}, [
-        h('thead', {}, [h('tr', {}, [h('th', {}, 'NO'), h('th', {}, 'NAMA'), h('th', {}, 'HARI HADIR'), h('th', {}, 'TOTAL GAJI'), h('th', { class: 'no-print' }, '')])]),
-        h('tbody', {}, rows.length ? rows : [h('tr', {}, [h('td', { colspan: '5' }, 'Belum ada pekerja')])]),
+        h('thead', {}, [h('tr', {}, [h('th', {}, 'NO'), h('th', {}, 'NAMA'), h('th', {}, 'HARI HADIR'), h('th', {}, 'GAJI/HARI'), h('th', {}, 'TOTAL GAJI'), h('th', { class: 'no-print' }, '')])]),
+        h('tbody', {}, rows.length ? rows : [h('tr', {}, [h('td', { colspan: '6' }, 'Belum ada pekerja')])]),
         h('tfoot', {}, [h('tr', {}, [
           h('td', { colspan: '2' }, 'TOTAL'),
           h('td', {}, fmt(totHari)),
+          h('td', {}, ''),
           h('td', {}, rupiah(totGaji)),
           h('td', { class: 'no-print' }, '')
         ])])
@@ -599,6 +634,93 @@
     ]);
   }
 
+  // ---------- ceklis semua pekerja ----------
+  function hariTerakhir(n) {
+    const t = hariIni(), list = [];
+    for (let i = n - 1; i >= 0; i--) list.push(addDays(t, -i));
+    return list; // paling kanan = hari ini
+  }
+  function formCeklis() {
+    const hari = hariTerakhir(jumlahKolom);
+    tanggalRender = hariIni();
+
+    const head = [h('th', { style: 'text-align:left' }, 'NAMA')];
+    hari.forEach(function (d, i) {
+      const today = i === hari.length - 1;
+      head.push(h('th', { class: 'hr' + (today ? ' today' : '') }, [
+        HARI[parseIso(d).getDay()],
+        h('small', {}, tgl(d).slice(0, 5)),
+        today ? h('small', {}, 'hari ini') : null
+      ]));
+    });
+
+    const rows = state.workers.map(function (w) {
+      const valid = new Set(daftarHari(w));
+      const cells = [h('td', { class: 'nm', title: w.nama }, w.nama)];
+      hari.forEach(function (d, i) {
+        const today = i === hari.length - 1;
+        const cb = h('input', { type: 'checkbox', tabindex: '-1' });
+        const td = h('td', {}, [cb]);
+        function warna(v) {
+          tampilSel(td, cb, d, v);
+          td.classList.add('cel');
+          if (today) td.classList.add('today-c');
+        }
+        if (!valid.has(d)) {
+          cb.disabled = true;
+          td.className = 'cel off' + (today ? ' today-c' : '');
+          td.title = 'Di luar periode kerja ' + w.nama;
+        } else {
+          warna(w.hadir[d] || 0);
+          td.setAttribute('tabindex', '0');
+          td.addEventListener('click', function () {
+            const v = SIKLUS[w.hadir[d] || 0];
+            denganUndo('Tanggal ' + tgl(d) + ' (' + w.nama + ') diubah.', function () {
+              setHadir(w, d, v);
+            });
+            warna(v);
+          });
+          td.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); td.click(); }
+          });
+        }
+        cells.push(td);
+      });
+      return h('tr', {}, cells);
+    });
+
+    const pilih = h('select', {
+      'aria-label': 'Jumlah hari tampil',
+      onchange: function (e) {
+        jumlahKolom = parseInt(e.target.value, 10);
+        try { localStorage.setItem(KUNCI_CEKLIS, String(jumlahKolom)); } catch (err) {}
+        renderKonten();
+      }
+    }, [2, 3, 4, 5].map(function (n) {
+      const o = h('option', { value: String(n) }, n + ' hari');
+      if (n === jumlahKolom) o.selected = true;
+      return o;
+    }));
+
+    return h('section', { class: 'box' }, [
+      h('div', { class: 'row' }, [
+        h('h2', { style: 'margin:0;flex:1' }, 'Ceklis Kehadiran'),
+        h('label', {}, ['Tampilkan', pilih])
+      ]),
+      state.workers.length
+        ? h('div', { class: 'table-box' }, [
+            h('table', { class: 'ceklis' }, [
+              h('thead', {}, [h('tr', {}, head)]),
+              h('tbody', {}, rows)
+            ])
+          ])
+        : h('div', { class: 'sub' }, 'Belum ada pekerja. Ketuk "+ Pekerja" di atas untuk memulai.')
+    ]);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && aktif === CEKLIS && tanggalRender && tanggalRender !== hariIni()) renderKonten();
+  });
+
   // ---------- navbar & render ----------
   function renderNav() {
     tabRefs.clear();
@@ -610,6 +732,10 @@
       tabRefs.set(w.id, b);
       return b;
     });
+    items.unshift(h('button', {
+      type: 'button', class: 'tab' + (aktif === CEKLIS ? ' aktif' : ''),
+      onclick: function () { aktif = CEKLIS; renderNav(); renderKonten(); }
+    }, 'Ceklis'));
     items.push(h('button', {
       type: 'button', class: 'tab' + (aktif === REKAP ? ' aktif' : ''),
       onclick: function () { aktif = REKAP; renderNav(); renderKonten(); }
@@ -628,13 +754,15 @@
     if (modeCetak) {
       children.push(rekapBox());
       state.workers.forEach(function (w) { children.push(kartu(w)); });
+    } else if (aktif === CEKLIS) {
+      children.push(formCeklis());
     } else if (aktif === TAMBAH) {
       children.push(formTambahPekerja());
     } else if (aktif === REKAP || !cariPekerja(aktif)) {
       if (aktif !== REKAP) { aktif = REKAP; renderNav(); }
       if (!state.workers.length) children.push(h('div', { class: 'sub' }, 'Belum ada pekerja. Ketuk "+ Pekerja" di atas untuk memulai.'));
       children.push(rekapBox());
-      children.push(h('div', { class: 'sub no-print' }, 'Ketuk nama pekerja di atas untuk mengisi kehadiran. Kotak hadir: centang = penuh, strip kuning = setengah hari.'));
+
     } else {
       children.push(kartu(cariPekerja(aktif)));
     }
@@ -659,9 +787,12 @@
     btn.title = teks;
     btn.style.color = lama ? 'var(--bahaya)' : '';
     btn.style.borderColor = lama ? 'var(--bahaya)' : '';
+    const mb = document.getElementById('menuBtn');
+    mb.style.color = lama ? 'var(--bahaya)' : '';
+    mb.style.borderColor = lama ? 'var(--bahaya)' : '';
   }
   function renderSemua() {
-    if (aktif !== REKAP && aktif !== TAMBAH && !cariPekerja(aktif)) aktif = REKAP;
+    if (aktif !== REKAP && aktif !== TAMBAH && aktif !== CEKLIS && !cariPekerja(aktif)) aktif = REKAP;
     renderNav();
     renderKonten();
     renderInfo();
@@ -891,6 +1022,22 @@
     } catch (err) {}
   });
 
+  // ---------- menu dropdown ----------
+  (function () {
+    const btn = document.getElementById('menuBtn');
+    const panel = document.getElementById('menuPanel');
+    function tutup() { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const buka = panel.hidden;
+      panel.hidden = !buka;
+      btn.setAttribute('aria-expanded', String(buka));
+    });
+    panel.addEventListener('click', function (e) { if (e.target.closest('button')) tutup(); });
+    document.addEventListener('click', function (e) { if (!panel.contains(e.target)) tutup(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') tutup(); });
+  })();
+
   // ---------- mulai ----------
   const dariLink = muatDariHash();
   if (!dariLink) {
@@ -900,11 +1047,7 @@
     }
   }
   simpan();
-  if (dariLink) {
-    aktif = REKAP;
-  } else {
-    aktif = state.workers[0] ? state.workers[0].id : REKAP;
-  }
+  aktif = dariLink ? REKAP : CEKLIS;
   renderSemua();
   if (dariLink) {
     tampilToast('Data dimuat dari link share.', null);
