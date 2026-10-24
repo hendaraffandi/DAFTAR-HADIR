@@ -75,6 +75,9 @@
   input.nama { flex: 1 1 120px; font-weight: 600; font-size: 11px; }
   input.tarif { width: 90px; }
   input.jumlahIn { width: 55px; }
+  .form-tambah label { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .form-tambah input.nama { width: 100%; flex: none; font-size: 13px; padding: 6px 8px; }
+  .form-tambah .row { margin-bottom: 8px; }
   .box {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; padding: 8px; margin: 8px 0;
@@ -148,6 +151,7 @@
   const KUNCI_LAMA = ['daftarHadir_v8', 'daftarHadir_v6'];
   const KUNCI_EKSPOR = 'daftarHadir_ekspor';
   const REKAP = '__rekap__';
+  const TAMBAH = '__tambah__';
   let state = { workers: [] };
   let aktif = REKAP;
   let modeCetak = false;
@@ -305,20 +309,89 @@
     else jalankan();
   }
   function tambahPekerja() {
-    const last = state.workers[state.workers.length - 1];
+    aktif = TAMBAH;
+    renderNav();
+    renderKonten();
+  }
+  function simpanPekerjaBaru(nama, tarif, mulai, jumlahHari) {
     const id = idBaru();
+    const namaBersih = String(nama || '').trim() || ('Pekerja ' + (state.workers.length + 1));
     state.workers.push({
       id: id,
-      nama: 'Pekerja ' + (state.workers.length + 1),
-      tarif: last ? last.tarif : 0,
-      mulai: last ? last.mulai : hariIni(),
-      jumlahHari: last ? last.jumlahHari : 31,
+      nama: namaBersih,
+      tarif: Math.max(0, Number(tarif) || 0),
+      mulai: tglValid(mulai) ? mulai : hariIni(),
+      jumlahHari: Math.min(366, Math.max(1, Math.floor(Number(jumlahHari)) || 31)),
       hadir: {}
     });
     aktif = id;
     simpan();
     renderNav();
     renderKonten();
+  }
+  function formTambahPekerja() {
+    const last = state.workers[state.workers.length - 1];
+    const defaultNama = 'Pekerja ' + (state.workers.length + 1);
+    const defaultTarif = last ? last.tarif : 0;
+    const defaultMulai = last ? last.mulai : hariIni();
+    const defaultJumlah = last ? last.jumlahHari : 31;
+
+    const inpNama = h('input', {
+      type: 'text', class: 'nama', value: defaultNama, 'aria-label': 'Nama pekerja',
+      placeholder: 'Nama pekerja', autofocus: 'autofocus'
+    });
+    const inpTarif = h('input', {
+      type: 'number', min: '0', inputmode: 'numeric', class: 'tarif',
+      value: defaultTarif, 'aria-label': 'Gaji per hari'
+    });
+    const inpMulai = h('input', {
+      type: 'date', value: defaultMulai, 'aria-label': 'Tanggal mulai'
+    });
+    const inpJumlah = h('input', {
+      type: 'number', min: '1', max: '366', inputmode: 'numeric', class: 'jumlahIn',
+      value: defaultJumlah, 'aria-label': 'Jumlah hari'
+    });
+
+    function submit() {
+      simpanPekerjaBaru(inpNama.value, inpTarif.value, inpMulai.value, inpJumlah.value);
+    }
+
+    [inpNama, inpTarif, inpMulai, inpJumlah].forEach(function (el) {
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); submit(); }
+      });
+    });
+
+    return h('section', { class: 'box form-tambah' }, [
+      h('h2', {}, 'Tambah Pekerja Baru'),
+      h('div', { class: 'row' }, [
+        h('label', { style: 'flex:1 1 100%' }, [
+          'Nama',
+          inpNama
+        ])
+      ]),
+      h('div', { class: 'row' }, [
+        h('label', {}, ['Gaji/hari', inpTarif]),
+        h('label', {}, ['Tanggal mulai', inpMulai]),
+        h('label', {}, ['Jumlah hari', inpJumlah])
+      ]),
+      h('div', { class: 'row', style: 'margin-top:8px; gap:8px' }, [
+        h('button', {
+          type: 'button', class: 'kecil',
+          style: 'background:var(--header);color:#fff;border-color:var(--header);font-weight:600;padding:6px 14px',
+          onclick: submit
+        }, 'Simpan'),
+        h('button', {
+          type: 'button', class: 'kecil',
+          onclick: function () {
+            aktif = REKAP;
+            renderNav();
+            renderKonten();
+          }
+        }, 'Batal')
+      ]),
+      h('div', { class: 'sub' }, 'Isi data di atas lalu ketuk Simpan. Nilai default diambil dari pekerja terakhir (jika ada).')
+    ]);
   }
   function hapusPekerja(id) {
     const w = cariPekerja(id);
@@ -541,7 +614,11 @@
       type: 'button', class: 'tab' + (aktif === REKAP ? ' aktif' : ''),
       onclick: function () { aktif = REKAP; renderNav(); renderKonten(); }
     }, 'Rekap'));
-    items.push(h('button', { type: 'button', class: 'tab tambah', onclick: tambahPekerja }, '+ Pekerja'));
+    items.push(h('button', {
+      type: 'button',
+      class: 'tab tambah' + (aktif === TAMBAH ? ' aktif' : ''),
+      onclick: tambahPekerja
+    }, '+ Pekerja'));
     document.getElementById('navbar').replaceChildren.apply(document.getElementById('navbar'), items);
   }
   function renderKonten() {
@@ -551,6 +628,8 @@
     if (modeCetak) {
       children.push(rekapBox());
       state.workers.forEach(function (w) { children.push(kartu(w)); });
+    } else if (aktif === TAMBAH) {
+      children.push(formTambahPekerja());
     } else if (aktif === REKAP || !cariPekerja(aktif)) {
       if (aktif !== REKAP) { aktif = REKAP; renderNav(); }
       if (!state.workers.length) children.push(h('div', { class: 'sub' }, 'Belum ada pekerja. Ketuk "+ Pekerja" di atas untuk memulai.'));
@@ -561,6 +640,10 @@
     }
     app.replaceChildren.apply(app, children);
     refreshRekap();
+    if (aktif === TAMBAH) {
+      const el = app.querySelector('input.nama');
+      if (el) setTimeout(function () { el.focus(); el.select(); }, 30);
+    }
   }
   function renderInfo() {
     let t = 0;
@@ -578,7 +661,7 @@
     btn.style.borderColor = lama ? 'var(--bahaya)' : '';
   }
   function renderSemua() {
-    if (aktif !== REKAP && !cariPekerja(aktif)) aktif = REKAP;
+    if (aktif !== REKAP && aktif !== TAMBAH && !cariPekerja(aktif)) aktif = REKAP;
     renderNav();
     renderKonten();
     renderInfo();
